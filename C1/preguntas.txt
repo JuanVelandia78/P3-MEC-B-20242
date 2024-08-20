@@ -1,0 +1,68 @@
+
+##¿Una clase abstracta puede heredar de otra clase abstracta?{T}
+
+##¿Qué es una clase abstracta?
+{
+=Una clase que no puede ser instanciada y puede contener métodos abstractos.
+~Una clase que solo contiene métodos abstractos.
+~Una clase que puede ser instanciada pero no puede contener métodos concretos.
+}
+
+##¿Qué es la sobrecarga de métodos?
+{
+=Definir múltiples métodos con el mismo nombre pero con diferentes parámetros.
+~Redefinir un método en una subclase.
+~Cambiar el tipo de retorno de un método.
+}
+
+##¿Cuál es la funcionalidad de la composición en Java?
+{
+=Su función es utilizar objetos dentro de otros objetos.
+~Su función es permitir que una clase herede propiedades y métodos de otra clase.
+~Su función es definir una interfaz que debe ser implementada por otras clases.
+~Su función es implementar polimorfismo para que un método pueda tener diferentes comportamientos en diferentes clases.
+}
+
+##¿Qué es la agregación en Java?
+{
+=Es un tipo de asociación entre clases en la que una clase contiene una referencia a otra clase.
+~Es un mecanismo que permite a una clase tener múltiples instancias de otras clases sin que estas dependan de la clase que las contiene.
+~Es un tipo de herencia que permite a una clase heredar de varias clases base.
+~Es una técnica para encapsular datos dentro de una clase.
+}
+
+##¿Cuál es la diferencia entre agregación y composición?
+{
+=En la composicion el objeto contenido no puede existir sin el objeto que lo contiene, mientras que en la agregación el objeto contenido puede existir independientemente del objeto que lo contiene.
+~La agregación permite la herencia de métodos entre clases, mientras que la composición no lo permite.
+~La composición se utiliza para definir interfaces que deben ser implementadas por otras clases, mientras que la agregación no tiene relación con las interfaces.
+~La agregación permite que una clase utilice múltiples instancias de otras clases, mientras que la composición permite la instancia de una sola clase dentro de otra.
+}
+
+##¿Cómo se define una clase que hereda de otra en Java?
+{
+=class Hija extends Padre
+~class Hija inherits Padre
+~class Hija implements Padre
+}
+
+##¿Cómo se implementa el polimorfismo en Java?
+{
+~Usando métodos estáticos.
+~Usando métodos sobrecargados.
+=Usando métodos sobreescritos y interfaces.
+}
+
+##¿Qué son los métodos getter y setter?
+{
+=Métodos que permiten acceder y modificar las variables privadas de una clase.
+~Métodos que solo permiten modificar las variables privadas.
+~Métodos que solo permiten acceder a las variables privadas.
+}
+
+##¿Cómo se define una variable privada en una clase Java?
+{
+=private int variable;
+~int private variable;
+~protected int variable;
+}

@@ -13,6 +13,7 @@ public class EPS extends JFrame {
     private JComboBox<String> cmbServicio;
     private JTextArea txtAreaCola;
     private ColaPacientes colaPacientes;
+    private JLabel lblProximoPaciente;
 
     public EPS() {
         setTitle("Simulación EPS");
@@ -22,7 +23,7 @@ public class EPS extends JFrame {
 
         colaPacientes = new ColaPacientes();
 
-        // Panel de registro de paciente
+        // Panel de registro
         JPanel panelRegistro = new JPanel(new GridLayout(4, 2, 5, 5));
         panelRegistro.add(new JLabel("Cédula:"));
         txtCedula = new JTextField();
@@ -45,12 +46,25 @@ public class EPS extends JFrame {
         });
         panelRegistro.add(btnRegistrar);
 
+        JButton btnAtender = new JButton("Atender Próximo Paciente");
+        btnAtender.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                atenderPaciente();
+            }
+        });
+        panelRegistro.add(btnAtender);
+
         add(panelRegistro, BorderLayout.WEST);
 
         // Área de la cola de pacientes
         txtAreaCola = new JTextArea();
         txtAreaCola.setEditable(false);
         add(new JScrollPane(txtAreaCola), BorderLayout.CENTER);
+
+        // Etiqueta para mostrar el próximo paciente
+        lblProximoPaciente = new JLabel("Próximo Paciente: N/A");
+        add(lblProximoPaciente, BorderLayout.SOUTH);
     }
 
     private void registrarPaciente() {
@@ -67,6 +81,13 @@ public class EPS extends JFrame {
         Paciente nuevoPaciente = new Paciente(cedula, categoria, servicio, horaLlegada);
         colaPacientes.agregarPaciente(nuevoPaciente);
         actualizarCola();
+        mostrarProximoPaciente(colaPacientes.verProximoPaciente());
+    }
+
+    private void atenderPaciente() {
+        Paciente pacienteAtendido = colaPacientes.siguientePaciente();
+        actualizarCola();
+        mostrarProximoPaciente(colaPacientes.verProximoPaciente());
     }
 
     private void actualizarCola() {
@@ -77,6 +98,14 @@ public class EPS extends JFrame {
         txtAreaCola.setText(sb.toString());
     }
 
+    private void mostrarProximoPaciente(Paciente paciente) {
+        if (paciente != null) {
+            lblProximoPaciente.setText("Próximo Paciente: " + paciente.getCedula() + " - " + paciente.getCategoria() + " - " + paciente.getServicio());
+        } else {
+            lblProximoPaciente.setText("Próximo Paciente: N/A");
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             EPS frame = new EPS();
@@ -84,3 +113,4 @@ public class EPS extends JFrame {
         });
     }
 }
+

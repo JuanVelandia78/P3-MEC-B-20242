@@ -10,32 +10,38 @@ import java.util.Date;
 public class EPS extends JFrame {
     private JTextField txtCedula;
     private JComboBox<String> cmbCategoria;
-    private JComboBox<String> cmbServicio;
+    private final JComboBox<String> cmbServicio;
+    private final JLabel lblProximoPaciente;
     private JTextArea txtAreaCola;
     private ColaPacientes colaPacientes;
-    private JLabel lblProximoPaciente;
+    private JSlider sliderVelocidad;
+    private JLabel lblVelocidad;
+
+    private int tiempoAtencion = 15;
+    private boolean atendiendo = false;
 
     public EPS() {
         setTitle("Simulación EPS");
         setLayout(new BorderLayout());
-        setSize(600, 400);
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         colaPacientes = new ColaPacientes();
 
-        // Panel de registro
-        JPanel panelRegistro = new JPanel(new GridLayout(4, 2, 5, 5));
-        panelRegistro.add(new JLabel("Cédula:"));
+        JPanel panelIzquierdo = new JPanel();
+        panelIzquierdo.setLayout(new GridLayout(4, 2, 5, 5));
+
+        panelIzquierdo.add(new JLabel("Cédula (10 dígitos):"));
         txtCedula = new JTextField();
-        panelRegistro.add(txtCedula);
+        panelIzquierdo.add(txtCedula);
 
-        panelRegistro.add(new JLabel("Categoría:"));
+        panelIzquierdo.add(new JLabel("Categoría:"));
         cmbCategoria = new JComboBox<>(new String[]{"Menor de 60 años", "Adulto Mayor", "Persona con Discapacidad", "Otra"});
-        panelRegistro.add(cmbCategoria);
+        panelIzquierdo.add(cmbCategoria);
 
-        panelRegistro.add(new JLabel("Servicio:"));
-        cmbServicio = new JComboBox<>(new String[]{"Consulta General", "Consulta Especializada", "Laboratorio", "Imágenes"});
-        panelRegistro.add(cmbServicio);
+        panelIzquierdo.add(new JLabel("Servicio:"));
+        cmbServicio = new JComboBox<>(new String[]{"Consulta Médico General", "Consulta Médica Especializada", "Prueba de Laboratorio", "Imágenes Diagnósticas"});
+        panelIzquierdo.add(cmbServicio);
 
         JButton btnRegistrar = new JButton("Registrar Paciente");
         btnRegistrar.addActionListener(new ActionListener() {
@@ -44,27 +50,49 @@ public class EPS extends JFrame {
                 registrarPaciente();
             }
         });
-        panelRegistro.add(btnRegistrar);
+        panelIzquierdo.add(btnRegistrar);
 
-        JButton btnAtender = new JButton("Atender Próximo Paciente");
-        btnAtender.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                atenderPaciente();
-            }
-        });
-        panelRegistro.add(btnAtender);
+        panelIzquierdo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        add(panelRegistro, BorderLayout.WEST);
+        add(panelIzquierdo, BorderLayout.WEST);
 
-        // Área de la cola de pacientes
+        JPanel panelDerecho = new JPanel();
+        panelDerecho.setLayout(new BorderLayout());
+
+        JPanel panelProximo = new JPanel();
+        panelProximo.setLayout(new BorderLayout());
+        lblProximoPaciente = new JLabel("Próximo Paciente: N/A");
+        panelProximo.add(lblProximoPaciente, BorderLayout.CENTER);
+        panelProximo.setBorder(BorderFactory.createTitledBorder("Información del Próximo Paciente"));
+        panelDerecho.add(panelProximo, BorderLayout.NORTH);
+
+        JPanel panelLista = new JPanel();
+        panelLista.setLayout(new BorderLayout());
         txtAreaCola = new JTextArea();
         txtAreaCola.setEditable(false);
-        add(new JScrollPane(txtAreaCola), BorderLayout.CENTER);
+        panelLista.add(new JScrollPane(txtAreaCola), BorderLayout.CENTER);
+        panelLista.setBorder(BorderFactory.createTitledBorder("Cola de Pacientes"));
+        panelDerecho.add(panelLista, BorderLayout.CENTER);
 
-        // Etiqueta para mostrar el próximo paciente
-        lblProximoPaciente = new JLabel("Próximo Paciente: N/A");
-        add(lblProximoPaciente, BorderLayout.SOUTH);
+        JPanel panelSlider = new JPanel();
+        panelSlider.setLayout(new BorderLayout());
+
+        lblVelocidad = new JLabel("Tiempo de atención: " + tiempoAtencion + " minutos");
+        panelSlider.add(lblVelocidad, BorderLayout.NORTH);
+
+        sliderVelocidad = new JSlider(1, 30, tiempoAtencion);
+        sliderVelocidad.addChangeListener(e -> {
+            tiempoAtencion = sliderVelocidad.getValue();
+            lblVelocidad.setText("Tiempo de atención: " + tiempoAtencion + " minutos");
+        });
+
+        panelSlider.add(sliderVelocidad, BorderLayout.SOUTH);
+
+        panelDerecho.add(panelSlider, BorderLayout.SOUTH);
+
+        panelDerecho.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        add(panelDerecho, BorderLayout.EAST);
     }
 
     private void registrarPaciente() {
@@ -80,14 +108,15 @@ public class EPS extends JFrame {
 
         Paciente nuevoPaciente = new Paciente(cedula, categoria, servicio, horaLlegada);
         colaPacientes.agregarPaciente(nuevoPaciente);
+        
         actualizarCola();
-        mostrarProximoPaciente(colaPacientes.verProximoPaciente());
-    }
-
-    private void atenderPaciente() {
-        Paciente pacienteAtendido = colaPacientes.siguientePaciente();
-        actualizarCola();
-        mostrarProximoPaciente(colaPacientes.verProximoPaciente());
+        
+        if (colaPacientes.tamaño() >= 10 && !atendiendo) {
+            mostrarProximoPaciente(colaPacientes.verProximoPaciente());
+            iniciarAtencion();
+        } else {
+            mostrarProximoPaciente(colaPacientes.verProximoPaciente());
+        }
     }
 
     private void actualizarCola() {
@@ -100,10 +129,39 @@ public class EPS extends JFrame {
 
     private void mostrarProximoPaciente(Paciente paciente) {
         if (paciente != null) {
-            lblProximoPaciente.setText("Próximo Paciente: " + paciente.getCedula() + " - " + paciente.getCategoria() + " - " + paciente.getServicio());
+            lblProximoPaciente.setText("Próximo Paciente: " + paciente.getCedula() + " - " + paciente.getCategoria() + " - " + paciente.getServicio() + " - " + paciente.getHoraLlegada());
         } else {
             lblProximoPaciente.setText("Próximo Paciente: N/A");
         }
+    }
+
+    private void iniciarAtencion() {
+        atendiendo = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (colaPacientes.tamaño() > 0) {
+                    Paciente pacienteActual = colaPacientes.siguientePaciente();
+                    mostrarProximoPaciente(pacienteActual);
+                    try{
+                        int tiempoAtencionMilisegundos = tiempoAtencion * 60 * 10;
+                        Thread.sleep(tiempoAtencionMilisegundos);
+                    } catch (InterruptedException e) {
+                    }
+                    
+                    lblProximoPaciente.setText("Atendiendo: " + pacienteActual.getCedula());
+                    
+                    actualizarCola();
+                    
+                    if (colaPacientes.tamaño() > 0) {
+                        mostrarProximoPaciente(colaPacientes.verProximoPaciente());
+                    } else {
+                        lblProximoPaciente.setText("Próximo Paciente: N/A");
+                    }
+                }
+                atendiendo = false;
+            }
+        }).start();
     }
 
     public static void main(String[] args) {
@@ -113,4 +171,3 @@ public class EPS extends JFrame {
         });
     }
 }
-

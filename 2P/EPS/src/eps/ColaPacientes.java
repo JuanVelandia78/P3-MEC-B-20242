@@ -1,10 +1,10 @@
 package eps;
 
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 
 public class ColaPacientes {
-    private List<Paciente> pacientes;
+    private Queue<Paciente> pacientes;
 
     public ColaPacientes() {
         pacientes = new LinkedList<>();
@@ -15,23 +15,22 @@ public class ColaPacientes {
     }
 
     public Paciente siguientePaciente() {
-        if (!pacientes.isEmpty()) {
-            return pacientes.remove(0);
-        }
-        return null;
+        return pacientes.poll();
+    }
+
+    public int tamaño() {
+        return pacientes.size();
+    }
+
+    public Queue<Paciente> getPacientes() {
+        return pacientes;
     }
 
     public Paciente verProximoPaciente() {
-        if (!pacientes.isEmpty()) {
-            return pacientes.get(0);
-        }
-        return null;
-    }
-
-    public List<Paciente> getPacientes() {
-        return pacientes;
+        return pacientes.peek();
     }
 }
+
 
 
 
